@@ -35,7 +35,9 @@ $ cd packngo-api
 
 # Instale as dependências
 $ composer install
-$ npm install
+
+# Execute a migração
+$ php artisan migrate
 
 # Execute a apicação
 $ php artisan serve
