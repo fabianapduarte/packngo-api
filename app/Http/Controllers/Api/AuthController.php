@@ -16,6 +16,14 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(
+            'auth:api',
+            ['except' => ['login', 'register']]
+        );
+    }
+
     /**
      * Handle an authentication attempt.
      */
@@ -37,7 +45,7 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
 
-            $user = auth()->user();
+            $user = Auth::user();
 
             return response()->json(compact('user', 'token'));
         } catch (JWTException $e) {
@@ -74,12 +82,9 @@ class AuthController extends Controller
         }
     }
 
-    protected function respondWithToken($token): array
+    public function logout(): JsonResponse
     {
-        return [
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')
-        ];
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }
