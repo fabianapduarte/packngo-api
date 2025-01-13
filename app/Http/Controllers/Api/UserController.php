@@ -17,8 +17,8 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $this->authorize('view', $id);
         $user = User::findOrFail($id);
+        $this->authorize('view', $user);
         return response()->json($user);
     }
 
@@ -31,9 +31,8 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $this->authorize('update', $id);
-
         $user = User::findOrFail($id);
+        $this->authorize('update', $user);
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|between:2,100',
@@ -62,9 +61,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->authorize('delete', $id);
-
         $user = User::findOrFail($id);
+        $this->authorize('delete', $user);
 
         $user->delete();
 

@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
 use App\Models\User;
 
 class UserPolicy
@@ -18,9 +17,9 @@ class UserPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(string $id, User $model): bool
+    public function view(User $user, User $model): bool
     {
-        return $id == $model->id;
+        return $user->id == $model->id;
     }
 
     /**
@@ -34,17 +33,17 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(string $id, User $model): bool
+    public function update(User $user, User $model): bool
     {
-        return $id == $model->id;
+        return $user->id == $model->id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(string $id, User $model): bool
+    public function delete(User $user, User $model): bool
     {
-        return $id == $model->id;
+        return $user->id == $model->id;
     }
 
     /**
