@@ -21,4 +21,6 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth-jwt')
 
 Route::group(['prefix' => 'users'], function ($router) {
     Route::get('{id}', [UserController::class, 'show'])->middleware('auth-jwt');
+    Route::patch('{id}', [UserController::class, 'update'])->middleware('auth-jwt');
+    Route::delete('{id}', [UserController::class, 'destroy'])->middleware('auth-jwt');
 });
