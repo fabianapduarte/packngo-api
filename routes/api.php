@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Middleware\JwtMiddleware;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,4 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout']);
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
+
+Route::group(['prefix' => 'users'], function ($router) {
+    Route::get('{id}', [UserController::class, 'show'])->middleware('auth-jwt');
+});
