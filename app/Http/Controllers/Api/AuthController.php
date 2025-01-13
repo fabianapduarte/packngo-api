@@ -43,8 +43,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:8',
-            'image_path' => 'sometimes|file|mimes:jpeg,png,svg'
+            'password' => 'required|string|confirmed|min:8'
         ]);
 
         if ($validator->fails()) {
@@ -54,7 +53,6 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
-            'image_path' => $request->get('image_path'),
             'password' => Hash::make($request->get('password'))
         ]);
 

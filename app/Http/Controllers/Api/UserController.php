@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Ramsey\Uuid\Uuid;
 
 class UserController extends Controller
 {
@@ -37,7 +38,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|between:2,100',
             'password' => 'sometimes|string|confirmed|min:8',
-            'image_path' => ['sometimes', 'file', 'max:2000', 'mimes:png,jpeg,jpg'],
         ]);
 
         if ($request->has('email')) {
@@ -51,6 +51,29 @@ class UserController extends Controller
         $user->update($validator->validated());
 
         return response()->json(['user' => $user], 200);
+    }
+
+    public function updateProfileImage(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+        $this->authorize('update', $user);
+
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->toJson()], 400);
+        }
+
+        $imageName = (string) Uuid::uuid4() . '.' . $request->file('image')->extension();
+        $request->image->move(storage_path('app/public/'), $imageName);
+
+        $user->update([
+            'image_path' => 'storage/app/public/' . $imageName
+        ]);
+
+        return response()->json(['message' => 'Profile image updated successfully'], 200);
     }
 
     /**
