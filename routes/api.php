@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
 
 #TRIP
 Route::post('/addTrip', [TripController::class, 'addTrip'])->middleware('auth-jwt');
