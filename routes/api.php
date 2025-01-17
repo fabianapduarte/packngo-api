@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\TripController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,12 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
+
+#TRIP
+Route::post('/addTrip', [TripController::class, 'addTrip'])->middleware('auth-jwt');
+Route::get('/showTrip/{id}', [TripController::class, 'showTrip'])->middleware('auth-jwt');
+Route::put('/updateTrip/{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
+Route::delete('/deleteTrip/{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
 
 Route::group(['prefix' => 'users'], function ($router) {
     Route::get('{id}', [UserController::class, 'show'])->middleware('auth-jwt');
