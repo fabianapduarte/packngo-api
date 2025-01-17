@@ -59,7 +59,7 @@ class UserController extends Controller
         $this->authorize('update', $user);
 
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|max:2048',
+            'image' => 'required|image',
         ]);
 
         if ($validator->fails()) {
@@ -69,11 +69,9 @@ class UserController extends Controller
         $imageName = (string) Uuid::uuid4() . '.' . $request->file('image')->extension();
         $request->image->move(storage_path('app/public/'), $imageName);
 
-        $user->update([
-            'image_path' => 'storage/app/public/' . $imageName
-        ]);
+        $user->update(['image_path' => $imageName]);
 
-        return response()->json(['message' => 'Profile image updated successfully'], 200);
+        return response()->json(['user' => $user], 200);
     }
 
     /**
