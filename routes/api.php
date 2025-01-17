@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
 
 Route::group(['prefix' => 'users'], function ($router) {
     Route::get('{id}', [UserController::class, 'show'])->middleware('auth-jwt');
