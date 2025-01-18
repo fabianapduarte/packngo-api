@@ -18,12 +18,11 @@ class TripController extends Controller
     public function addTrip(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|between:2,100|unique:trips',
+            'title' => 'required|string|between:2,100',
             'destination' => 'required|string|max:100',
             'startDate' => 'required|date|after:today',
             'endDate' => 'required|date|after_or_equal:startDate'
         ], [
-            'title.unique' => 'Já existe uma viagem com esse título.',
             'title.between' => 'O título deve ter entre 2 e 100 caracteres.',
             'destination.max' => 'O destino não pode ter mais de 100 caracteres.',
             'startDate.after' => 'A data de início deve ser posterior à data atual.',
@@ -67,8 +66,8 @@ class TripController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
         $tripIds = Trip_participant::where('id_user', $user->id)
-        ->whereNull('deleted_at')
-        ->pluck('id_trip');
+            ->whereNull('deleted_at')
+            ->pluck('id_trip');
 
         $trips = Trip::whereIn('id', $tripIds)->get();
         return response()->json($trips);
@@ -112,7 +111,7 @@ class TripController extends Controller
         }
     }
 
-    public function deleteTrip(Request $request, string $id) 
+    public function deleteTrip(Request $request, string $id)
     {
         $trip = Trip::findOrFail($id);
         $trip->deleted_at = $request->get('deleted_at');
