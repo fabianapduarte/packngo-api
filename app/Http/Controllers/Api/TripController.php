@@ -114,8 +114,7 @@ class TripController extends Controller
     public function deleteTrip(Request $request, string $id)
     {
         $trip = Trip::findOrFail($id);
-        $trip->deleted_at = $request->get('deleted_at');
-        $trip->save();
+        $trip->delete();
 
         return response()->json(['message' => 'Viagem deletada com sucesso.']);
     }
