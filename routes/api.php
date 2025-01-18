@@ -22,9 +22,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth-jwt'
 
 #TRIP
 Route::post('/addTrip', [TripController::class, 'addTrip'])->middleware('auth-jwt');
+Route::post('/joinTrip/{id}', [TripController::class, 'joinTrip'])->middleware('auth-jwt');
+Route::get('/getTrips', [TripController::class, 'getTrips'])->middleware('auth-jwt');
 Route::get('/showTrip/{id}', [TripController::class, 'showTrip'])->middleware('auth-jwt');
-Route::put('/updateTrip/{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
-Route::delete('/deleteTrip/{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
+Route::get('/getParticipants/{id}', [TripController::class, 'getParticipants'])->middleware('auth-jwt');
+Route::patch('/updateTrip/{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
+Route::patch('/deleteTrip/{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
 
 Route::group(['prefix' => 'users'], function ($router) {
     Route::get('{id}', [UserController::class, 'show'])->middleware('auth-jwt');
