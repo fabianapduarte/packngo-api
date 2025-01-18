@@ -10,6 +10,7 @@ use App\Models\Trip;
 use App\Models\User;
 use App\Models\Trip_participant;
 use Illuminate\Support\Facades\Hash;
+use Ramsey\Uuid\Uuid;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TripController extends Controller
@@ -21,7 +22,8 @@ class TripController extends Controller
             'title' => 'required|string|between:2,100',
             'destination' => 'required|string|max:100',
             'startDate' => 'required|date|after:today',
-            'endDate' => 'required|date|after_or_equal:startDate'
+            'endDate' => 'required|date|after_or_equal:startDate',
+            'image' => 'sometimes|image'
         ], [
             'title.between' => 'O título deve ter entre 2 e 100 caracteres.',
             'destination.max' => 'O destino não pode ter mais de 100 caracteres.',
@@ -36,12 +38,15 @@ class TripController extends Controller
 
         $user = JWTAuth::parseToken()->authenticate();
 
+        $imageName = (string) Uuid::uuid4() . '.' . $request->file('image')->extension();
+        $request->image->move(storage_path('app/public/'), $imageName);
+
         $trip = Trip::create([
             'title' => $request->get('title'),
             'destination' => $request->get('destination'),
             'start_date' => $request->get('startDate'),
             'end_date' => $request->get('endDate'),
-            'image_path' => $request->get('imagePreview')
+            'image_path' => $imageName
         ]);
         $trip_participant = Trip_participant::create([
             'id_user' => $user->id,
