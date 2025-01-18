@@ -82,8 +82,8 @@ class TripController extends Controller
     public function getParticipants(string $id)
     {
         $usersIds = Trip_participant::where('id_trip', $id)->pluck('id_user');
-        $usersNames = User::whereIn('id', $usersIds)->pluck('name');
-        return response()->json($usersNames);
+        $users = User::whereIn('id', $usersIds)->select('name', 'image_path')->get();
+        return response()->json($users);
     }
 
     public function updateTrip(Request $request, string $id)
