@@ -20,18 +20,19 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth-jwt');
 
-#TRIP
-Route::post('/addTrip', [TripController::class, 'addTrip'])->middleware('auth-jwt');
-Route::post('/joinTrip/{id}', [TripController::class, 'joinTrip'])->middleware('auth-jwt');
-Route::get('/getTrips', [TripController::class, 'getTrips'])->middleware('auth-jwt');
-Route::get('/showTrip/{id}', [TripController::class, 'showTrip'])->middleware('auth-jwt');
-Route::get('/getParticipants/{id}', [TripController::class, 'getParticipants'])->middleware('auth-jwt');
-Route::patch('/updateTrip/{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
-Route::patch('/deleteTrip/{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
-
 Route::group(['prefix' => 'users'], function ($router) {
     Route::get('{id}', [UserController::class, 'show'])->middleware('auth-jwt');
     Route::patch('{id}', [UserController::class, 'update'])->middleware('auth-jwt');
     Route::delete('{id}', [UserController::class, 'destroy'])->middleware('auth-jwt');
     Route::post('{id}/update-profile-img', [UserController::class, 'updateProfileImage'])->middleware('auth-jwt');
+});
+
+Route::group(['prefix' => 'trips'], function ($router) {
+    Route::get('/', [TripController::class, 'getTrips'])->middleware('auth-jwt');
+    Route::post('/', [TripController::class, 'addTrip'])->middleware('auth-jwt');
+    Route::get('{id}', [TripController::class, 'showTrip'])->middleware('auth-jwt');
+    Route::post('{id}/join', [TripController::class, 'joinTrip'])->middleware('auth-jwt');
+    Route::get('{id}/participants', [TripController::class, 'getParticipants'])->middleware('auth-jwt');
+    Route::patch('{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
+    Route::delete('{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
 });
