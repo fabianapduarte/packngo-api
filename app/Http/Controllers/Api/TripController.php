@@ -126,12 +126,11 @@ class TripController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|between:2,100',
             'destination' => 'required|string|max:100',
-            'startDate' => 'required|date|after:today',
+            'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate'
         ], [
             'title.between' => 'O título deve ter entre 2 e 100 caracteres.',
             'destination.max' => 'O destino não pode ter mais de 100 caracteres.',
-            'startDate.after' => 'A data de início deve ser posterior à data atual.',
             'endDate.after_or_equal' => 'A data de término deve ser igual ou após a data de início.'
         ]);
 
