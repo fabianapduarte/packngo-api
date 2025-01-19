@@ -165,6 +165,12 @@ class TripController extends Controller
     public function leaveTrip(string $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
+        $participantCount = Trip_participant::where('id_trip', $id)->count();
+
+        if ($participantCount === 1) {
+            return response()->json(['error' => 'Não é permitido sair da viagem sendo o único participante.'], 400);
+        }
+
         $tripParticipant = Trip_participant::where('id_trip', $id)
             ->where('id_user', $user->id)
             ->first();
