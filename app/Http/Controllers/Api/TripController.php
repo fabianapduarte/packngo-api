@@ -70,10 +70,18 @@ class TripController extends Controller
         $trip = Trip::findOrFail($id);
         $user = JWTAuth::parseToken()->authenticate();
 
-        Trip_participant::create([
-            'id_user' => $user->id,
-            'id_trip' => $trip->id
-        ]);
+        $exists = Trip_participant::where('id_user', $user->id)
+        ->where('id_trip', $trip->id)
+        ->exists();
+
+        if (!$exists) {
+            Trip_participant::create([
+                'id_user' => $user->id,
+                'id_trip' => $trip->id
+            ]);
+        }else{
+            return response()->json(['error' => 'Você já faz parte dessa viagem!'], 400);
+        }
         return response()->json(['trip_id' => $trip->id], 200);
     }
 
