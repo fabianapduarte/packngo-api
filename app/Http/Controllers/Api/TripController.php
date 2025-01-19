@@ -178,7 +178,7 @@ class TripController extends Controller
         return response()->json(['message' => 'Viagem deixada com sucesso.']);
     }
 
-    public function updateProfileImage(Request $request, string $id)
+    public function updateImage(Request $request, string $id)
     {
         $trip = Trip::findOrFail($id);
         $this->authorize('isParticipant', $trip);
@@ -191,7 +191,7 @@ class TripController extends Controller
             return response()->json(['error' => $validator->errors()->toJson()], 400);
         }
 
-        $imageName = $request->file('image')->getClientOriginalName();
+        $imageName = (string) Uuid::uuid4() . '.' . $request->file('image')->extension();
         $request->image->move(storage_path('app/public/'), $imageName);
 
         $trip->update(['image_path' => $imageName]);
