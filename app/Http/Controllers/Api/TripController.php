@@ -126,4 +126,51 @@ class TripController extends Controller
 
         return response()->json(['message' => 'Viagem deletada com sucesso.']);
     }
+
+
+
+    #utils
+    public function setStatus(object $data)
+    {
+        if ($data) {
+            $status = null;
+            $now = new \DateTime();
+
+            $startDate = new \DateTime($data['start_date']);
+            $endDate = new \DateTime($data['end_date']);
+
+            if ($now < $startDate) {
+                $status = EnumTravelStatus::PLANNED;
+            } elseif ($now > $endDate) {
+                $status = EnumTravelStatus::FINISHED;
+            } else {
+                $status = EnumTravelStatus::PROGRESS;
+            }
+
+            $tripArray = $data->toArray();
+            $tripArray['status'] = $status;
+
+            return $tripArray;
+        }
+    }
+
+    public function setStatusForTrips($trips)
+    {
+        $now = new \DateTime();
+
+        return $trips->map(function ($trip) use ($now) {
+            $startDate = new \DateTime($trip->start_date);
+            $endDate = new \DateTime($trip->end_date);
+
+            if ($now < $startDate) {
+                $trip->status = EnumTravelStatus::PLANNED;
+            } elseif ($now > $endDate) {
+                $trip->status = EnumTravelStatus::FINISHED;
+            } else {
+                $trip->status = EnumTravelStatus::PROGRESS;
+            }
+
+            return $trip;
+        });
+    }
 }
