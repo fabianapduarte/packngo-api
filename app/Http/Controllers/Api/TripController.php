@@ -12,9 +12,15 @@ use App\Models\Trip_participant;
 use Ramsey\Uuid\Uuid;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
+class EnumTravelStatus
+{
+    const PROGRESS = 'progress';
+    const FINISHED = 'finished';
+    const PLANNED = 'planned';
+}
+
 class TripController extends Controller
 {
-
     public function addTrip(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -59,13 +65,15 @@ class TripController extends Controller
         return response()->json(compact('trip'), 201);
     }
 
-    public function joinTrip(string $id, Request $request): JsonResponse
+    public function joinTrip(string $code, Request $request): JsonResponse
     {
         $user = JWTAuth::parseToken()->authenticate();
 
+        $trip = Trip::where('code', $code)->first();
+
         $trip = Trip_participant::create([
             'id_user' => $user->id,
-            'id_trip' => $id
+            'id_trip' => $trip->id
         ]);
         return response()->json(compact('trip'), 201);
     }
@@ -78,12 +86,21 @@ class TripController extends Controller
             ->pluck('id_trip');
 
         $trips = Trip::whereIn('id', $tripIds)->get();
+        $trips = $this->setStatusForTrips($trips);
         return response()->json($trips);
     }
 
     public function showTrip(string $id)
     {
         $trip = Trip::findOrFail($id);
+        $trip = $this->setStatus($trip);
+        return response()->json($trip);
+    }
+
+    public function fetchTrip(string $code)
+    {
+        $trip = Trip::where('code', $code)->first();
+        $trip = $this->setStatus($trip);
         return response()->json($trip);
     }
 
@@ -119,7 +136,7 @@ class TripController extends Controller
         }
     }
 
-    public function deleteTrip(Request $request, string $id)
+    public function deleteTrip(string $id)
     {
         $trip = Trip::findOrFail($id);
         $trip->delete();
@@ -127,6 +144,17 @@ class TripController extends Controller
         return response()->json(['message' => 'Viagem deletada com sucesso.']);
     }
 
+    public function leaveTrip(string $id)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $tripParticipant = Trip_participant::where('id_trip', $id)
+            ->where('id_user', $user->id)
+            ->first();
+
+        $tripParticipant->delete();
+
+        return response()->json(['message' => 'Viagem deixada com sucesso.']);
+    }
 
 
     #utils
