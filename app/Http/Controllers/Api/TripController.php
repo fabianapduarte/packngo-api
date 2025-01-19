@@ -88,9 +88,7 @@ class TripController extends Controller
     public function getTrips()
     {
         $user = JWTAuth::parseToken()->authenticate();
-        $tripIds = Trip_participant::where('id_user', $user->id)
-            ->whereNull('deleted_at')
-            ->pluck('id_trip');
+        $tripIds = Trip_participant::where('id_user', $user->id)->pluck('id_trip');
 
         $trips = Trip::whereIn('id', $tripIds)->get();
         $trips = $this->setStatusForTrips($trips);
