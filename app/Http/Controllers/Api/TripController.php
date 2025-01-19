@@ -156,7 +156,7 @@ class TripController extends Controller
     {
         $trip = Trip::findOrFail($id);
         $this->authorize('isParticipant', $trip);
-
+        Trip_participant::where('id_trip', $id)->delete();
         $trip->delete();
 
         return response()->json(['message' => 'Viagem deletada com sucesso.']);
