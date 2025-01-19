@@ -117,27 +117,32 @@ class TripController extends Controller
 
     public function updateTrip(Request $request, string $id)
     {
-        try {
-            $validatedData = $request->validate([
-                'title' => 'string|max:255',
-                'destination' => 'string|max:255',
-                'start_date' => 'date',
-                'end_date' => 'date|after_or_equal:start_date',
-                'imagePreview' => 'string|nullable',
-            ]);
-
-            $trip = Trip::findOrFail($id);
-
-            $trip->update($validatedData);
-
-            return response()->json(['message' => 'Trip updated successfully.', 'trip' => $trip], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Trip not found.'], 404);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['error' => $e->errors()], 400);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An unexpected error occurred.'], 500);
+        $trip = Trip::find($request->route('id'));
+        if (!$trip) {
+            return response()->json(["error" => "Viagem não encontrada."], 404);
         }
+        $this->authorize('isParticipant', $trip);
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|between:2,100',
+            'destination' => 'required|string|max:100',
+            'startDate' => 'required|date|after:today',
+            'endDate' => 'required|date|after_or_equal:startDate'
+        ], [
+            'title.between' => 'O título deve ter entre 2 e 100 caracteres.',
+            'destination.max' => 'O destino não pode ter mais de 100 caracteres.',
+            'startDate.after' => 'A data de início deve ser posterior à data atual.',
+            'endDate.after_or_equal' => 'A data de término deve ser igual ou após a data de início.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(["error" => $validator->errors()->toJson()], 400);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $trip->update($validator->validated());
+        return response()->json(compact('trip'), 200);
     }
 
     public function deleteTrip(string $id)
