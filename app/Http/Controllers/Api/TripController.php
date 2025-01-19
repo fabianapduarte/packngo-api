@@ -85,6 +85,8 @@ class TripController extends Controller
     public function showTrip(string $id)
     {
         $trip = Trip::findOrFail($id);
+        $participants = $this->getParticipants($trip->id);
+        $trip->participants = $participants;
         return response()->json($trip);
     }
 

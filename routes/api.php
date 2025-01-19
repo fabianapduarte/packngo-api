@@ -33,7 +33,6 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::get('{id}', [TripController::class, 'showTrip'])->middleware('auth-jwt');
     Route::get('/{code}/preview-trip', [TripController::class, 'previewTrip'])->middleware('auth-jwt');
     Route::post('/{id}/join', [TripController::class, 'joinTrip'])->middleware('auth-jwt');
-    Route::get('{id}/participants', [TripController::class, 'getParticipants'])->middleware('auth-jwt');
     Route::patch('{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
     Route::delete('{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
 });
