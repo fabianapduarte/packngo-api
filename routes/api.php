@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\TripController;
 use Illuminate\Support\Facades\Route;
@@ -36,4 +37,10 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::patch('{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
     Route::delete('{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
     Route::delete('{id}/leave', [TripController::class, 'leaveTrip'])->middleware('auth-jwt');
+
+    Route::get('{idTrip}/events', [EventController::class, 'index'])->middleware('auth-jwt');
+    Route::post('{idTrip}/events', [EventController::class, 'create'])->middleware('auth-jwt');
+    Route::put('{idTrip}/events/{idEvent}', [EventController::class, 'edit'])->middleware('auth-jwt');
+    Route::delete('{idTrip}/events/{idEvent}', [EventController::class, 'destroy'])->middleware('auth-jwt');
+    Route::post('{idTrip}/events/{idEvent}/join', [EventController::class, 'join'])->middleware('auth-jwt');
 });

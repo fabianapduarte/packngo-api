@@ -2,12 +2,136 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Event;
 use App\Http\Controllers\Controller;
+use App\Models\EventParticipant;
+use App\Models\Trip;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
+use Illuminate\Validation\Validator as ValidationValidator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class EventController extends Controller
 {
-    public function addEvent(Request $request, string $id) {}
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(string $idTrip): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $this->authorize('isParticipant', $trip);
+
+        $events = Event::where('id_trip', $idTrip)->get();
+        return response()->json($events, 200);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(string $idTrip, Request $request): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $this->authorize('isParticipant', $trip);
+
+        $validator = $this->validateRequest($request);
+
+        if ($validator->fails()) {
+            return response()->json(["error" => $validator->errors()->toJson()], 400);
+        }
+
+        $eventCreated = Event::create([
+            'title' => $request->get('title'),
+            'description' => $request->get('description'),
+            'destination' => $request->get('destination'),
+            'start_datetime' => $request->get('startDatetime'),
+            'end_datetime' => $request->get('endDatetime'),
+            'cost' => $request->get('cost'),
+            'share_cost' => $request->get('shareCost'),
+            'id_category' => $request->get('idCategory'),
+            'id_trip' => $idTrip,
+        ]);
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        EventParticipant::create([
+            'id_event' => $eventCreated->id,
+            'id_user' => $user->id,
+        ]);
+
+        return response()->json($eventCreated, 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $idTrip, string $idEvent): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $this->authorize('isParticipant', $trip);
+
+        $event = Event::findOrFail($idEvent);
+
+        return response()->json($event, 200);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $idTrip, string $idEvent, Request $request): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $event = Event::findOrFail($idEvent);
+
+        $this->authorize('isParticipant', $trip);
+
+        $validator = $this->validateRequest($request);
+
+        if ($validator->fails()) {
+            return response()->json(["error" => $validator->errors()->toJson()], 400);
+        }
+
+        $event->update($validator->validated());
+
+        return response()->json($event, 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $idTrip, string $idEvent): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $event = Event::findOrFail($idEvent);
+
+        $this->authorize('isParticipant', $trip);
+
+        EventParticipant::where('id_event', $idEvent)->delete();
+        $event->delete();
+
+        return response()->json();
+    }
+
+    protected function validateRequest(Request $request): ValidationValidator
+    {
+        return Validator::make($request->all(), [
+            'title' => 'required|string|between:2,100',
+            'description' => 'sometimes|string|max:100|nullable',
+            'destination' => 'required|string|max:100',
+            'startDatetime' => 'required|date_format:Y-m-d H:i|after:today',
+            'endDatetime' => 'required|date_format:Y-m-d H:i|after:startDatetime',
+            'cost' => 'required|decimal:0,2|min:0',
+            'shareCost' => 'required|boolean',
+            'idCategory' => 'required|numeric|min:1|max:7'
+        ], [
+            'title.between' => 'O título deve ter entre 2 e 100 caracteres.',
+            'description.max' => 'O destino não pode ter mais de 100 caracteres.',
+            'destination.max' => 'O destino não pode ter mais de 100 caracteres.',
+            'startDatetime.after' => 'A data de início deve ser posterior à data atual.',
+            'endDatetime.after' => 'A data de término deve ser igual ou após a data de início.',
+            'cost.min' => 'O valor do custo do evento não pode ser menor que 0.',
+            'idCategory.min' => 'Categoria inválida.',
+            'idCategory.max' => 'Categoria inválida.',
+        ]);
+    }
 }

@@ -5,15 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 
-class Trip extends Model
+class EventParticipant extends Model
 {
-    use HasApiTokens, HasFactory, SoftDeletes, HasUuids;
-
-    protected $keyType = 'string';
+    use HasApiTokens, HasFactory, HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -21,12 +17,8 @@ class Trip extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
-        'code',
-        'destination',
-        'start_date',
-        'end_date',
-        'image_path'
+        'id_user',
+        'id_event'
     ];
 
     /**
@@ -36,12 +28,6 @@ class Trip extends Model
      */
     protected $hidden = [
         'created_at',
-        'updated_at',
-        'deleted_at',
+        'updated_at'
     ];
-
-    public function event(): BelongsTo
-    {
-        return $this->belongsTo(Event::class, 'id_trip');
-    }
 }
