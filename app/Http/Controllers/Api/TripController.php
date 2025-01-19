@@ -92,6 +92,7 @@ class TripController extends Controller
     public function showTrip(string $id)
     {
         $trip = Trip::findOrFail($id);
+        $this->authorize('isParticipant', $trip);
         $participants = $this->getParticipants($trip->id);
         $trip->participants = $participants;
         $trip = $this->setStatus($trip);
@@ -142,6 +143,8 @@ class TripController extends Controller
     public function deleteTrip(string $id)
     {
         $trip = Trip::findOrFail($id);
+        $this->authorize('isParticipant', $trip);
+
         $trip->delete();
 
         return response()->json(['message' => 'Viagem deletada com sucesso.']);
