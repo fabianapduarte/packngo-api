@@ -35,6 +35,7 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::get('/{code}/fetch-trip', [TripController::class, 'fetchTrip'])->middleware('auth-jwt');
     Route::post('/{id}/join', [TripController::class, 'joinTrip'])->middleware('auth-jwt');
     Route::patch('{id}', [TripController::class, 'updateTrip'])->middleware('auth-jwt');
+    Route::post('{id}/update-profile-img', [TripController::class, 'updateProfileImage'])->middleware('auth-jwt');
     Route::delete('{id}', [TripController::class, 'deleteTrip'])->middleware('auth-jwt');
     Route::delete('{id}/leave', [TripController::class, 'leaveTrip'])->middleware('auth-jwt');
 
