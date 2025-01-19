@@ -71,15 +71,15 @@ class TripController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         $exists = Trip_participant::where('id_user', $user->id)
-        ->where('id_trip', $trip->id)
-        ->exists();
+            ->where('id_trip', $trip->id)
+            ->exists();
 
         if (!$exists) {
             Trip_participant::create([
                 'id_user' => $user->id,
                 'id_trip' => $trip->id
             ]);
-        }else{
+        } else {
             return response()->json(['error' => 'Você já faz parte dessa viagem!'], 400);
         }
         return response()->json(['trip_id' => $trip->id], 200);
@@ -125,7 +125,7 @@ class TripController extends Controller
 
     public function updateTrip(Request $request, string $id)
     {
-        $trip = Trip::find($request->route('id'));
+        $trip = Trip::find($id);
         if (!$trip) {
             return response()->json(["error" => "Viagem não encontrada."], 404);
         }
@@ -178,6 +178,27 @@ class TripController extends Controller
         $tripParticipant->delete();
 
         return response()->json(['message' => 'Viagem deixada com sucesso.']);
+    }
+
+    public function updateProfileImage(Request $request, string $id)
+    {
+        $trip = Trip::findOrFail($id);
+        $this->authorize('isParticipant', $trip);
+
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->toJson()], 400);
+        }
+
+        $imageName = $request->file('image')->getClientOriginalName();
+        $request->image->move(storage_path('app/public/'), $imageName);
+
+        $trip->update(['image_path' => $imageName]);
+
+        return response()->json(['trip' => $trip], 200);
     }
 
     protected function setStatus(object $data)
