@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Trip;
 use App\Models\User;
 use App\Models\Trip_participant;
-use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Uuid;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -35,14 +34,18 @@ class TripController extends Controller
             return response()->json(["error" => $validator->errors()->toJson()], 400);
         }
 
-
         $user = JWTAuth::parseToken()->authenticate();
 
-        $imageName = (string) Uuid::uuid4() . '.' . $request->file('image')->extension();
-        $request->image->move(storage_path('app/public/'), $imageName);
+        $imageName = null;
+
+        if ($request->file('image') != null) {
+            $imageName = (string) Uuid::uuid4() . '.' . $request->file('image')->extension();
+            $request->image->move(storage_path('app/public/'), $imageName);
+        }
 
         $trip = Trip::create([
             'title' => $request->get('title'),
+            'code' => str()->random(6),
             'destination' => $request->get('destination'),
             'start_date' => $request->get('startDate'),
             'end_date' => $request->get('endDate'),
