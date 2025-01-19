@@ -51,7 +51,7 @@ class TripController extends Controller
 
         $trip = Trip::create([
             'title' => $request->get('title'),
-            'code' => str()->random(6),
+            'code' => strtolower(str()->random(6)),
             'destination' => $request->get('destination'),
             'start_date' => $request->get('startDate'),
             'end_date' => $request->get('endDate'),
@@ -94,6 +94,7 @@ class TripController extends Controller
         $trip = Trip::findOrFail($id);
         $participants = $this->getParticipants($trip->id);
         $trip->participants = $participants;
+        $trip = $this->setStatus($trip);
         return response()->json($trip);
     }
 
@@ -158,9 +159,7 @@ class TripController extends Controller
         return response()->json(['message' => 'Viagem deixada com sucesso.']);
     }
 
-
-    #utils
-    public function setStatus(object $data)
+    protected function setStatus(object $data)
     {
         if ($data) {
             $status = null;
@@ -177,30 +176,16 @@ class TripController extends Controller
                 $status = EnumTravelStatus::PROGRESS;
             }
 
-            $tripArray = $data->toArray();
-            $tripArray['status'] = $status;
+            $data->status = $status;
 
-            return $tripArray;
+            return $data;
         }
     }
 
     public function setStatusForTrips($trips)
     {
-        $now = new \DateTime();
-
-        return $trips->map(function ($trip) use ($now) {
-            $startDate = new \DateTime($trip->start_date);
-            $endDate = new \DateTime($trip->end_date);
-
-            if ($now < $startDate) {
-                $trip->status = EnumTravelStatus::PLANNED;
-            } elseif ($now > $endDate) {
-                $trip->status = EnumTravelStatus::FINISHED;
-            } else {
-                $trip->status = EnumTravelStatus::PROGRESS;
-            }
-
-            return $trip;
+        return $trips->map(function ($trip) {
+            return $this->setStatus($trip);
         });
     }
 }
