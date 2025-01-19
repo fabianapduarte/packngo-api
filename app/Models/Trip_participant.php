@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 
 class Trip_participant extends Model
 {
-    use HasApiTokens, HasFactory, SoftDeletes, HasUuids;
+    use HasApiTokens, HasFactory, HasUuids;
     //
 
     /**
@@ -31,7 +29,6 @@ class Trip_participant extends Model
      */
     protected $hidden = [
         'created_at',
-        'updated_at',
-        'deleted_at',
+        'updated_at'
     ];
 }
