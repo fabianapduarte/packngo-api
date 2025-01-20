@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\PollController;
+use App\Http\Controllers\Api\ListsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,4 +51,8 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::get('{idTrip}/polls', [PollController::class, 'index'])->middleware('auth-jwt');
     Route::post('{idTrip}/polls', [PollController::class, 'create'])->middleware('auth-jwt');
     Route::post('{idTrip}/polls/{idPoll}/vote/{idOption}', [PollController::class, 'vote'])->middleware('auth-jwt');
+
+    Route::get('{idTrip}/lists', [ListsController::class, 'getLists'])->middleware('auth-jwt');
+    Route::post('{idTrip}/lists', [EventController::class, 'addLists'])->middleware('auth-jwt');
+    Route::delete('{idTrip}/lists/{idLists}', [EventController::class, 'deleteLists'])->middleware('auth-jwt');
 });
