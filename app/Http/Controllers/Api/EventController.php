@@ -46,7 +46,7 @@ class EventController extends Controller
             $individualCost = $event->share_cost ? $event->cost / $totalParticipants : $event->cost;
             $event->individual_cost = $individualCost;
 
-            $participants = User::whereIn('id', $participantsByEvent[$event->id])->select('name', 'image_path')->get();
+            $participants = User::whereIn('id', $participantsByEvent[$event->id])->select('name', 'image_path', 'id')->get();
             $event->participants = $participants;
 
             $categoryId = $event->id_category;
