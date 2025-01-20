@@ -52,7 +52,7 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::post('{idTrip}/polls', [PollController::class, 'create'])->middleware('auth-jwt');
     Route::post('{idTrip}/polls/{idPoll}/vote/{idOption}', [PollController::class, 'vote'])->middleware('auth-jwt');
 
-    Route::get('{idTrip}/lists', [ListsController::class, 'getLists'])->middleware('auth-jwt');
-    Route::post('{idTrip}/lists', [EventController::class, 'addLists'])->middleware('auth-jwt');
-    Route::delete('{idTrip}/lists/{idLists}', [EventController::class, 'deleteLists'])->middleware('auth-jwt');
+    Route::get('{idTrip}/lists', [ListsController::class, 'getList'])->middleware('auth-jwt');
+    Route::post('{idTrip}/lists', [ListsController::class, 'addItem'])->middleware('auth-jwt');
+    Route::delete('{idTrip}/lists/{idLists}', [EventController::class, 'deleteItem'])->middleware('auth-jwt');
 });

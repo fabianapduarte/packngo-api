@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Lists extends Model
 {
-    use HasApiTokens, HasFactory, SoftDeletes, HasUuids;    
+    use HasApiTokens, HasFactory, SoftDeletes, HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -19,9 +18,9 @@ class Lists extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
-        'is_checked',     
-        'id_trip'  
+        'item',
+        'is_checked',
+        'id_trip'
     ];
 
     /**
@@ -30,5 +29,8 @@ class Lists extends Model
      * @var array<int, string>
      */
     protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 }
