@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\TripController;
+use App\Http\Controllers\Api\ListsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,4 +46,8 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::delete('{idTrip}/events/{idEvent}', [EventController::class, 'destroy'])->middleware('auth-jwt');
     Route::post('{idTrip}/events/{idEvent}/join', [EventController::class, 'joinEvent'])->middleware('auth-jwt');
     Route::post('{idTrip}/events/{idEvent}/leave', [EventController::class, 'leaveEvent'])->middleware('auth-jwt');
+
+    Route::get('{idTrip}/lists', [ListsController::class, 'getLists'])->middleware('auth-jwt');
+    Route::post('{idTrip}/lists', [EventController::class, 'addLists'])->middleware('auth-jwt');
+    Route::delete('{idTrip}/lists/{idLists}', [EventController::class, 'deleteLists'])->middleware('auth-jwt');    
 });
