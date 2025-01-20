@@ -52,4 +52,18 @@ class ListsController extends Controller
 
         return response()->json(['message' => 'Item deletado com sucesso'], 200);
     }
+
+    public function checkItem(string $idTrip, string $idItem)
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $item = Lists::findOrFail($idItem);
+
+        $this->authorize('isParticipant', $trip);
+
+        $item->update([
+            'is_checked' => !$item->is_checked,
+        ]);
+
+        return response()->json($item, 200);
+    }
 }
