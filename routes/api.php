@@ -54,5 +54,5 @@ Route::group(['prefix' => 'trips'], function ($router) {
 
     Route::get('{idTrip}/lists', [ListsController::class, 'getList'])->middleware('auth-jwt');
     Route::post('{idTrip}/lists', [ListsController::class, 'addItem'])->middleware('auth-jwt');
-    Route::delete('{idTrip}/lists/{idLists}', [EventController::class, 'deleteItem'])->middleware('auth-jwt');
+    Route::delete('{idTrip}/lists/{idItem}', [ListsController::class, 'deleteItem'])->middleware('auth-jwt');
 });

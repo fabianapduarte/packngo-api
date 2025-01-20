@@ -7,7 +7,6 @@ use App\Models\Trip;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ListsController extends Controller
 {
@@ -42,22 +41,15 @@ class ListsController extends Controller
         return response()->json($newItem, 201);
     }
 
-    public function deleteLists(string $id, string $id_trip)
+    public function deleteItem(string $idTrip, string $idItem)
     {
         $trip = Trip::findOrFail($idTrip);
-        $user = JWTAuth::parseToken()->authenticate();
-        $list = Lists::findOrFail($id);
+        $item = Lists::findOrFail($idItem);
 
         $this->authorize('isParticipant', $trip);
 
-        $validator = $this->validateRequest($request);
+        $item->delete();
 
-        if ($validator->fails()) {
-            return response()->json(["error" => $validator->errors()->toJson()], 400);
-        }
-
-        //  ListsParticipant::where('id_lists', $id)->delete();
-        $list->delete();
         return response()->json(['message' => 'Item deletado com sucesso'], 200);
     }
 }
