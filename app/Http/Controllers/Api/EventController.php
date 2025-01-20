@@ -42,11 +42,14 @@ class EventController extends Controller
         $categories = Category::pluck('name', 'id');
 
         foreach ($events as $event) {
-            $totalParticipants = $countsByEvent->get($event->id);
-            $individualCost = $event->share_cost ? $event->cost / $totalParticipants : $event->cost;
-            $event->individual_cost = $individualCost;
+            $totalParticipants = $countsByEvent->has($event->id)
+                ? $countsByEvent->get($event->id) : 0;
+            $event->individual_cost = $totalParticipants > 0
+                ? ($event->share_cost ? $event->cost / $totalParticipants : $event->cost) : 0;
 
-            $participants = User::whereIn('id', $participantsByEvent[$event->id])->select('name', 'image_path', 'id')->get();
+            $participants = isset($participantsByEvent[$event->id])
+                ? User::whereIn('id', $participantsByEvent[$event->id])->select('name', 'image_path', 'id')->get()
+                : collect();
             $event->participants = $participants;
 
             $categoryId = $event->id_category;
