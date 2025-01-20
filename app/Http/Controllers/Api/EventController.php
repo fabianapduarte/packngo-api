@@ -124,7 +124,16 @@ class EventController extends Controller
             return response()->json(["error" => $validator->errors()->toJson()], 400);
         }
 
-        $event->update($validator->validated());
+        $event->update([
+            'title' => $request->get('title'),
+            'description' => $request->get('description'),
+            'destination' => $request->get('destination'),
+            'start_datetime' => $request->get('startDatetime'),
+            'end_datetime' => $request->get('endDatetime'),
+            'cost' => $request->get('cost'),
+            'share_cost' => $request->get('shareCost'),
+            'id_category' => $request->get('idCategory'),
+        ]);
 
         return response()->json($event, 200);
     }
