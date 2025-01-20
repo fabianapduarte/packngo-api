@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EventParticipant;
 use App\Models\Trip;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -30,21 +31,26 @@ class EventController extends Controller
             array_push($eventsIds, $event->id);
         }
 
-        $participants = EventParticipant::whereIn('id_event', $eventsIds)->get();
-        $countsByEvent = $participants->countBy('id_event');
+        $allEventsParticipants = EventParticipant::whereIn('id_event', $eventsIds)->get();
+        $participantsByEvent = $allEventsParticipants
+            ->groupBy('id_event')
+            ->map(function ($group) {
+                return $group->pluck('id_user')->toArray();
+            });
+        $countsByEvent = $allEventsParticipants->countBy('id_event');
 
+        $categories = Category::pluck('name', 'id');
 
         foreach ($events as $event) {
             $totalParticipants = $countsByEvent->get($event->id);
             $individualCost = $event->share_cost ? $event->cost / $totalParticipants : $event->cost;
-            $event->individualCost = $individualCost;
+            $event->individual_cost = $individualCost;
 
-            $category = Category::where('id', $event->id_category)->first();
-            if ($category) {
-                $event->category_name = $category->name;
-            } else {
-                $event->category_name = null;
-            }
+            $participants = User::whereIn('id', $participantsByEvent[$event->id])->select('name', 'image_path')->get();
+            $event->participants = $participants;
+
+            $categoryId = $event->id_category;
+            $event->category_name = $categories[$categoryId];
         }
 
         return response()->json($events, 200);
