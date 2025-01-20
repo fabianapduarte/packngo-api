@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Event;
+use App\Models\Poll;
 use App\Models\Trip;
 use App\Models\User;
 use App\Policies\TripPolicy;
@@ -32,5 +33,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Trip::class, TripPolicy::class);
         Gate::policy(Event::class, TripPolicy::class);
+        Gate::policy(Poll::class, TripPolicy::class);
     }
 }
