@@ -43,5 +43,6 @@ Route::group(['prefix' => 'trips'], function ($router) {
     Route::post('{idTrip}/events', [EventController::class, 'create'])->middleware('auth-jwt');
     Route::put('{idTrip}/events/{idEvent}', [EventController::class, 'edit'])->middleware('auth-jwt');
     Route::delete('{idTrip}/events/{idEvent}', [EventController::class, 'destroy'])->middleware('auth-jwt');
-    Route::post('{idTrip}/events/{idEvent}/join', [EventController::class, 'join'])->middleware('auth-jwt');
+    Route::post('{idTrip}/events/{idEvent}/join', [EventController::class, 'joinEvent'])->middleware('auth-jwt');
+    Route::post('{idTrip}/events/{idEvent}/leave', [EventController::class, 'leaveEvent'])->middleware('auth-jwt');
 });

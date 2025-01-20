@@ -109,7 +109,50 @@ class EventController extends Controller
         EventParticipant::where('id_event', $idEvent)->delete();
         $event->delete();
 
-        return response()->json();
+        return response()->json(['message' => 'Evento apagado com sucesso!'], 200);
+    }
+
+    public function joinEvent(string $idTrip, string $idEvent): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $event = Event::findOrFail($idEvent);
+
+        $this->authorize('isParticipant', $trip);
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $eventParticipant = EventParticipant::where('id_event', $event->id)->where('id_user', $user->id)->count();
+
+        if ($eventParticipant > 0) {
+            return response()->json(['message' => 'Você já está participando do evento.'], 400);
+        }
+
+        EventParticipant::create([
+            'id_event' => $event->id,
+            'id_user' => $user->id,
+        ]);
+
+        return response()->json(['message' => 'Sua participação no evento foi confirmada com sucesso.'], 200);
+    }
+
+    public function leaveEvent(string $idTrip, string $idEvent): JsonResponse
+    {
+        $trip = Trip::findOrFail($idTrip);
+        $event = Event::findOrFail($idEvent);
+
+        $this->authorize('isParticipant', $trip);
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $eventParticipant = EventParticipant::where('id_event', $event->id)->where('id_user', $user->id);
+
+        if ($eventParticipant->count() == 0) {
+            return response()->json(['message' => 'Você já cancelou sua participação no evento.'], 400);
+        }
+
+        $eventParticipant->delete();
+
+        return response()->json(['message' => 'Sua participação no evento foi cancelada com sucesso.'], 200);
     }
 
     protected function validateRequest(Request $request): ValidationValidator
