@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Http\Controllers\Controller;
 use App\Models\EventParticipant;
 use App\Models\Trip;
+use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -37,9 +38,16 @@ class EventController extends Controller
             $totalParticipants = $countsByEvent->get($event->id);
             $individualCost = $event->share_cost ? $event->cost / $totalParticipants : $event->cost;
             $event->individualCost = $individualCost;
+
+            $category = Category::where('id', $event->id_category)->first();
+            if ($category) {
+                $event->category_name = $category->name;
+            } else {
+                $event->category_name = null;
+            }
         }
 
-        return response()->json($event, 200);
+        return response()->json($events, 200);
     }
 
     /**
