@@ -23,7 +23,23 @@ class EventController extends Controller
         $this->authorize('isParticipant', $trip);
 
         $events = Event::where('id_trip', $idTrip)->get();
-        return response()->json($events, 200);
+
+        $eventsIds = [];
+        foreach ($events as $event) {
+            array_push($eventsIds, $event->id);
+        }
+
+        $participants = EventParticipant::whereIn('id_event', $eventsIds)->get();
+        $countsByEvent = $participants->countBy('id_event');
+
+
+        foreach ($events as $event) {
+            $totalParticipants = $countsByEvent->get($event->id);
+            $individualCost = $event->share_cost ? $event->cost / $totalParticipants : $event->cost;
+            $event->individualCost = $individualCost;
+        }
+
+        return response()->json($event, 200);
     }
 
     /**
